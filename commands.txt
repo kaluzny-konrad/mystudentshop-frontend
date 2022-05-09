@@ -2,3 +2,4 @@ go mod init github.com/kaluzny-konrad/mystudentshop-frontend
 go run main.go
 go get github.com/gorilla/mux
 go test ./...
+go build

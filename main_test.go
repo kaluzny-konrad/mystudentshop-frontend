@@ -4,36 +4,14 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
-
-func TestHandler(t *testing.T) {
-	req, err := http.NewRequest("GET", "", nil)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	recorder := httptest.NewRecorder()
-	hf := http.HandlerFunc(handlerHello)
-	hf.ServeHTTP(recorder, req)
-
-	if status := recorder.Code; status != http.StatusOK {
-		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusOK)
-	}
-
-	expected := `Hello World!`
-	actual := recorder.Body.String()
-	if actual != expected {
-		t.Errorf("handler returned unexpected body: got %v want %v", actual, expected)
-	}
-}
 
 func TestRouter(t *testing.T) {
 	r := newRouter()
 	mockServer := httptest.NewServer(r)
-	resp, err := http.Get(mockServer.URL + "/hello")
+	resp, err := http.Get(mockServer.URL + "/")
 
 	if err != nil {
 		t.Fatal(err)
@@ -49,17 +27,17 @@ func TestRouter(t *testing.T) {
 		t.Fatal(err)
 	}
 	respString := string(b)
-	expected := "Hello World!"
+	expected := "Witaj na portalu zakupowym!"
 
-	if respString != expected {
-		t.Errorf("Response should be %s, got %s", expected, respString)
+	if !strings.Contains(respString, expected) {
+		t.Errorf("Response should contain %s, got %s", expected, respString)
 	}
 }
 
 func TestRouterForNonExistentRoute(t *testing.T) {
 	r := newRouter()
 	mockServer := httptest.NewServer(r)
-	resp, err := http.Post(mockServer.URL+"/hello", "", nil)
+	resp, err := http.Post(mockServer.URL+"/", "", nil)
 
 	if err != nil {
 		t.Fatal(err)
@@ -70,16 +48,6 @@ func TestRouterForNonExistentRoute(t *testing.T) {
 	}
 
 	defer resp.Body.Close()
-	b, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		t.Fatal(err)
-	}
-	respString := string(b)
-	expected := ""
-
-	if respString != expected {
-		t.Errorf("Response should be %s, got %s", expected, respString)
-	}
 }
 
 func TestStaticFileServer(t *testing.T) {
