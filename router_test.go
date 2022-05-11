@@ -9,7 +9,7 @@ import (
 )
 
 func TestRouter(t *testing.T) {
-	r := newRouter()
+	r := getRouter()
 	mockServer := httptest.NewServer(r)
 	resp, err := http.Get(mockServer.URL + "/")
 
@@ -22,6 +22,17 @@ func TestRouter(t *testing.T) {
 	}
 
 	defer resp.Body.Close()
+}
+
+func TestRouterString(t *testing.T) {
+	r := getRouter()
+	mockServer := httptest.NewServer(r)
+	resp, err := http.Get(mockServer.URL + "/")
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		t.Fatal(err)
@@ -35,7 +46,7 @@ func TestRouter(t *testing.T) {
 }
 
 func TestRouterForNonExistentRoute(t *testing.T) {
-	r := newRouter()
+	r := getRouter()
 	mockServer := httptest.NewServer(r)
 	resp, err := http.Post(mockServer.URL+"/", "", nil)
 
@@ -50,8 +61,8 @@ func TestRouterForNonExistentRoute(t *testing.T) {
 	defer resp.Body.Close()
 }
 
-func TestStaticFileServer(t *testing.T) {
-	r := newRouter()
+func TestStaticFileServerRouter(t *testing.T) {
+	r := getRouter()
 	mockServer := httptest.NewServer(r)
 
 	resp, err := http.Get(mockServer.URL + "/static/")
